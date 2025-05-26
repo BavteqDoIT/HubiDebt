@@ -1,35 +1,53 @@
 import { useContext, useState } from 'react';
-import { Alert } from 'react-native';
-
-import AuthContent from '../components/Auth/AuthContent';
-import LoadingOverlay from '../components/ui/LoadingOverlay';
+import { Alert, StyleSheet, Text, View, ActivityIndicator } from 'react-native'; // Dodaj ActivityIndicator i Text
 import { AuthContext } from '../store/auth-context';
-import { login } from '../util/auth';
+import { login } from '../util/auth'; // Upewnij się, że importujesz 'login'
+import AuthContent from '../components/Auth/AuthContent';
+import { Colors } from '../constants/styles'; // Upewnij się, że masz Colors
 
 function LoginScreen() {
+  const authCtx = useContext(AuthContext);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const authCtx = useContext(AuthContext);
-
-  async function loginHandler({ email, password }) {
+  async function submitHandler({ email, password }) { // Odbierasz tylko email i password
     setIsAuthenticating(true);
+
     try {
-      const token = await login(email, password);
-      authCtx.authenticate(token);
+      const { token, uid, userEmail } = await login(email, password); // Wywołujesz login i odbierasz pełne dane
+      authCtx.authenticate(token, uid, userEmail); // Przekazujesz PEŁNE DANE do kontekstu
     } catch (error) {
       Alert.alert(
-        'Authentication failed!',
-        'Could not log you in. Please check your credentials or try again later!'
+        'Błąd Logowania!',
+        'Nie udało się zalogować. Sprawdź swoje dane lub spróbuj ponownie później.'
       );
       setIsAuthenticating(false);
     }
   }
 
   if (isAuthenticating) {
-    return <LoadingOverlay message="Logging you in..." />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary500} />
+        <Text style={styles.loadingText}>Logowanie...</Text>
+      </View>
+    );
   }
 
-  return <AuthContent isLogin onAuthenticate={loginHandler} />;
+  return <AuthContent isLogin onAuthenticate={submitHandler} />;
 }
 
 export default LoginScreen;
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.primary100,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: Colors.primary800,
+  },
+});

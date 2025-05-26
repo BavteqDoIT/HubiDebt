@@ -35,11 +35,12 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   }
 
   function submitHandler() {
+    // ZMIANA TUTAJ: Dodajemy enteredConfirmEmail i enteredConfirmPassword
     onSubmit({
       email: enteredEmail,
-      confirmEmail: enteredConfirmEmail,
+      emailConfirm: enteredConfirmEmail, // Nazwa klucza może być inna, jeśli wolisz, np. confirmEmail
       password: enteredPassword,
-      confirmPassword: enteredConfirmPassword,
+      passwordConfirm: enteredConfirmPassword, // Nazwa klucza może być inna, jeśli wolisz, np. confirmPassword
     });
   }
 

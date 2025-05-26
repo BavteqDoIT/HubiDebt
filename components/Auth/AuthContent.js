@@ -25,15 +25,32 @@ function AuthContent({ isLogin, onAuthenticate }) {
   }
 
   function submitHandler(credentials) {
-    let { email, confirmEmail, password, confirmPassword } = credentials;
+    // ZMIANA TUTAJ: Odpowiednio odbieramy zmienione nazwy kluczy
+    let { email, emailConfirm, password, passwordConfirm } = credentials; // Zmieniono na emailConfirm i passwordConfirm
 
     email = email.trim();
     password = password.trim();
 
     const emailIsValid = email.includes('@');
-    const passwordIsValid = password.length > 6;
-    const emailsAreEqual = email === confirmEmail;
-    const passwordsAreEqual = password === confirmPassword;
+    const passwordIsValid = password.length >= 6; // Upewnij się, że to >= 6
+    const emailsAreEqual = email === emailConfirm; // Używamy emailConfirm
+    const passwordsAreEqual = password === passwordConfirm; // Używamy passwordConfirm
+
+    console.log("--- AuthContent Validation Logs ---");
+    console.log("Entered Email:", email);
+    console.log("Entered Password:", password);
+    if (!isLogin) {
+      console.log("Entered Confirm Email:", emailConfirm); // Używamy emailConfirm
+      console.log("Entered Confirm Password:", passwordConfirm); // Używamy passwordConfirm
+    }
+    console.log("emailIsValid:", emailIsValid);
+    console.log("passwordIsValid:", passwordIsValid);
+    if (!isLogin) {
+      console.log("emailsAreEqual:", emailsAreEqual);
+      console.log("passwordsAreEqual:", passwordsAreEqual);
+    }
+    console.log("---------------------------------");
+
 
     if (
       !emailIsValid ||
@@ -43,14 +60,16 @@ function AuthContent({ isLogin, onAuthenticate }) {
       Alert.alert('Invalid input', 'Please check your entered credentials.');
       setCredentialsInvalid({
         email: !emailIsValid,
-        confirmEmail: !emailIsValid || !emailsAreEqual,
+        confirmEmail: !emailIsValid || !emailsAreEqual, // Odniesienie do `credentialsInvalid` powinno być `confirmEmail`
         password: !passwordIsValid,
-        confirmPassword: !passwordIsValid || !passwordsAreEqual,
+        confirmPassword: !passwordIsValid || !passwordsAreEqual, // Odniesienie do `credentialsInvalid` powinno być `confirmPassword`
       });
       return;
     }
     onAuthenticate({ email, password });
+    console.log("AuthContent - submitHandler: Validation passed, calling onAuthenticate.");
   }
+
 
   return (
     <View style={styles.authContent}>
